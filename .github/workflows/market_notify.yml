@@ -1,0 +1,26 @@
+name: 相場通知 to Slack
+
+on:
+  schedule:
+    # JST = UTC+9 なので UTC で指定
+    - cron: '0 1 * * *'   # JST 10:00
+    - cron: '0 3 * * *'   # JST 12:00
+    - cron: '0 6 * * *'   # JST 15:00
+  workflow_dispatch:       # 手動実行ボタン（テスト用）
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Python セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 相場通知スクリプトを実行
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python market_notify.py
