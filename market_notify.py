@@ -42,7 +42,7 @@ def get_nikkei():
 
 
 def arrow(value):
-    return "🔺" if value >= 0 else "🔻"
+    return "🟢" if value >= 0 else "🔴"
 
 
 def fmt(n, decimals=2):
@@ -75,14 +75,10 @@ def build_message(now):
         lines.append(
             f"{arrow(btc_pct)} *Bitcoin* ({pct(btc_pct)})\n${fmt(btc_usd, 0)}\n"
         )
-        lines.append(
-            "- 減少した値（赤色になる）"
-            "+ 上昇した値（緑色になる）"
-        )
 
     except Exception as e:
-        lines.append(f"😡 *USD/JPY*\n取得失敗 ({e})")
-        lines.append(f"😡 *Bitcoin*\n取得失敗 ({e})")
+        lines.append(f"🟡 *USD/JPY*\n取得失敗 ({e})")
+        lines.append(f"🟡 *Bitcoin*\n取得失敗 ({e})")
 
     # 日経平均
     try:
@@ -91,7 +87,7 @@ def build_message(now):
             f"{arrow(change_pct)} *日経平均* ({pct(change_pct)})\n{fmt(price)} 円\n"
         )
     except Exception as e:
-        lines.append(f"😡 *日経平均*\n取得失敗 ({e})")
+        lines.append(f"🟡 *日経平均*\n取得失敗 ({e})")
 
     return "\n".join(lines)
 
