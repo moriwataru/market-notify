@@ -66,16 +66,18 @@ def build_message(now):
         usdjpy = float(cg["usd"]["jpy"])
         usdjpy_pct = float(cg["usd"].get("jpy_24h_change") or 0.0)
         lines.append(
-            f"{arrow(usdjpy_pct)} *USD/JPY*\n{fmt(usdjpy)} 円\n"
-            f"　{pct(usdjpy_pct)}"
+            f"{arrow(usdjpy_pct)} *USD/JPY* ({pct(usdjpy_pct)})\n{fmt(usdjpy)} 円\n"
         )
  
         # Bitcoin（USD建て）
         btc_usd = float(cg["bitcoin"]["usd"])
         btc_pct = float(cg["bitcoin"].get("usd_24h_change") or 0.0)
         lines.append(
-            f"{arrow(btc_pct)} *Bitcoin*\n${fmt(btc_usd, 0)}\n"
-            f"　{pct(btc_pct)}"
+            f"{arrow(btc_pct)} *Bitcoin* ({pct(btc_pct)})\n${fmt(btc_usd, 0)}\n"
+        )
+        lines.append(
+            "- 減少した値（赤色になる）"
+            "+ 上昇した値（緑色になる）"
         )
 
     except Exception as e:
@@ -86,8 +88,7 @@ def build_message(now):
     try:
         price, change_pct = get_nikkei()
         lines.append(
-            f"{arrow(change_pct)} *日経平均*\n{fmt(price)} 円\n"
-            f"　{pct(change_pct)}"
+            f"{arrow(change_pct)} *日経平均* ({pct(change_pct)})\n{fmt(price)} 円\n"
         )
     except Exception as e:
         lines.append(f"😡 *日経平均*\n取得失敗 ({e})")
