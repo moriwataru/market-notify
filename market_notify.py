@@ -63,18 +63,18 @@ def build_message(now):
         cg = get_market_data()
 
         # USD/JPY
-        usdjpy = cg["usd"]["jpy"]
-        usdjpy_pct = cg["usd"].get("jpy_24h_change", 0)
+        usdjpy = float(cg["usd"]["jpy"])
+        usdjpy_pct = float(cg["usd"].get("jpy_24h_change") or 0.0)
         lines.append(
-            f"{arrow(usdjpy_pct)} *USD/JPY*\n¥{fmt(usdjpy)} 円\n"
+            f"{arrow(usdjpy_pct)} USD/JPY：¥{fmt(usdjpy)} 円\n"
             f"　{pct(usdjpy_pct)}"
         )
-
+ 
         # Bitcoin（USD建て）
-        btc_usd = cg["bitcoin"]["usd"]
-        btc_pct = cg["bitcoin"].get("usd_24h_change", 0)
+        btc_usd = float(cg["bitcoin"]["usd"])
+        btc_pct = float(cg["bitcoin"].get("usd_24h_change") or 0.0)
         lines.append(
-            f"{arrow(btc_pct)} *Bitcoin（BTC/USD）*\n${fmt(btc_usd, 0)}\n"
+            f"{arrow(btc_pct)} Bitcoin（BTC/USD）：${fmt(btc_usd, 0)}\n"
             f"　{pct(btc_pct)}"
         )
 
