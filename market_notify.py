@@ -20,10 +20,10 @@ def fetch_json(url, headers=None):
 
 
 def get_market_data():
-    """CoinGeckoから為替・Bitcoinを一括取得"""
+    """CoinGeckoから為替・Bitcoinを一括取得（24h変化率含む）"""
     url = (
         "https://api.coingecko.com/api/v3/simple/price"
-        "?ids=bitcoin,usd&vs_currencies=jpy&include_24hr_change=true"
+        "?ids=bitcoin,usd&vs_currencies=jpy,usd&include_24hr_change=true"
     )
     return fetch_json(url)
 
@@ -37,9 +37,8 @@ def get_nikkei():
     meta = result["meta"]
     price = meta.get("regularMarketPrice") or meta.get("previousClose")
     prev = meta.get("previousClose", price)
-    change = price - prev
-    change_pct = (change / prev) * 100 if prev else 0
-    return price, change, change_pct
+    change_pct = ((price - prev) / prev) * 100 if prev else 0
+    return price, change_pct
 
 
 def arrow(value):
@@ -48,6 +47,11 @@ def arrow(value):
 
 def fmt(n, decimals=2):
     return f"{n:,.{decimals}f}"
+
+
+def pct(value):
+    sign = "+" if value >= 0 else ""
+    return f"{sign}{fmt(value)}%"
 
 
 def build_message(now):
@@ -60,30 +64,33 @@ def build_message(now):
 
         # USD/JPY
         usdjpy = cg["usd"]["jpy"]
-        lines.append(f"💴 *USD/JPY*：¥{fmt(usdjpy)} 円")
-
-        # Bitcoin
-        btc = cg["bitcoin"]["jpy"]
-        btc_pct = cg["bitcoin"].get("jpy_24h_change", 0)
-        sign = "+" if btc_pct >= 0 else ""
+        usdjpy_pct = cg["usd"].get("jpy_24h_change", 0)
         lines.append(
-            f"{arrow(btc_pct)} *Bitcoin（BTC/JPY）*：¥{fmt(btc, 0)}  "
-            f"({sign}{fmt(btc_pct)}% 24h)"
+            f"{arrow(usdjpy_pct)} *USD/JPY*\n¥{fmt(usdjpy)} 円\n"
+            f"　{pct(usdjpy_pct)}"
         )
+
+        # Bitcoin（USD建て）
+        btc_usd = cg["bitcoin"]["usd"]
+        btc_pct = cg["bitcoin"].get("usd_24h_change", 0)
+        lines.append(
+            f"{arrow(btc_pct)} *Bitcoin（BTC/USD）*\n${fmt(btc_usd, 0)}\n"
+            f"　{pct(btc_pct)}"
+        )
+
     except Exception as e:
-        lines.append(f"💴 *USD/JPY*：取得失敗 ({e})")
-        lines.append(f"₿ *Bitcoin*：取得失敗 ({e})")
+        lines.append(f"💴 *USD/JPY*\n取得失敗 ({e})")
+        lines.append(f"₿ *Bitcoin*\n取得失敗 ({e})")
 
     # 日経平均
     try:
-        price, change, change_pct = get_nikkei()
-        sign = "+" if change >= 0 else ""
+        price, change_pct = get_nikkei()
         lines.append(
-            f"{arrow(change)} *日経平均*：{fmt(price)} 円  "
-            f"({sign}{fmt(change)} / {sign}{fmt(change_pct)}%)"
+            f"{arrow(change_pct)} *日経平均*\n{fmt(price)} 円\n"
+            f"　{pct(change_pct)}"
         )
     except Exception as e:
-        lines.append(f"📈 *日経平均*：取得失敗 ({e})")
+        lines.append(f"📈 *日経平均*\n取得失敗 ({e})")
 
     return "\n".join(lines)
 
