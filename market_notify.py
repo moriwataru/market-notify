@@ -56,7 +56,7 @@ def pct(value):
 
 def build_message(now):
     time_str = now.strftime("%H:%M JST  %Y/%m/%d")
-    lines = [f"📊 *相場情報 - {time_str}*\n"]
+    lines = [f"*相場情報 - {time_str}*\n"]
 
     # CoinGeckoで為替・BTC一括取得
     try:
@@ -66,7 +66,7 @@ def build_message(now):
         usdjpy = float(cg["usd"]["jpy"])
         usdjpy_pct = float(cg["usd"].get("jpy_24h_change") or 0.0)
         lines.append(
-            f"{arrow(usdjpy_pct)} USD/JPY：¥{fmt(usdjpy)} 円\n"
+            f"{arrow(usdjpy_pct)} *USD/JPY*\n{fmt(usdjpy)} 円\n"
             f"　{pct(usdjpy_pct)}"
         )
  
@@ -74,13 +74,13 @@ def build_message(now):
         btc_usd = float(cg["bitcoin"]["usd"])
         btc_pct = float(cg["bitcoin"].get("usd_24h_change") or 0.0)
         lines.append(
-            f"{arrow(btc_pct)} Bitcoin（BTC/USD）：${fmt(btc_usd, 0)}\n"
+            f"{arrow(btc_pct)} *Bitcoin*\n${fmt(btc_usd, 0)}\n"
             f"　{pct(btc_pct)}"
         )
 
     except Exception as e:
-        lines.append(f"💴 *USD/JPY*\n取得失敗 ({e})")
-        lines.append(f"₿ *Bitcoin*\n取得失敗 ({e})")
+        lines.append(f"😡 *USD/JPY*\n取得失敗 ({e})")
+        lines.append(f"😡 *Bitcoin*\n取得失敗 ({e})")
 
     # 日経平均
     try:
@@ -90,7 +90,7 @@ def build_message(now):
             f"　{pct(change_pct)}"
         )
     except Exception as e:
-        lines.append(f"📈 *日経平均*\n取得失敗 ({e})")
+        lines.append(f"😡 *日経平均*\n取得失敗 ({e})")
 
     return "\n".join(lines)
 
