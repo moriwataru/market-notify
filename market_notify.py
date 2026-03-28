@@ -19,11 +19,24 @@ def fetch_json(url, headers=None):
         return json.loads(res.read().decode())
 
 
-def get_market_data():
-    """CoinGeckoから為替・Bitcoinを一括取得（24h変化率含む）"""
+def get_usdjpy():
+    """USD/JPYをYahoo Finance APIから取得"""
+    url = "https://query1.finance.yahoo.com/v8/finance/chart/USDJPY%3DX?interval=1d&range=2d"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    data = fetch_json(url, headers)
+    result = data["chart"]["result"][0]
+    meta = result["meta"]
+    price = meta.get("regularMarketPrice") or meta.get("previousClose")
+    prev = meta.get("previousClose", price)
+    change_pct = ((price - prev) / prev) * 100 if prev else 0
+    return price, change_pct
+
+
+def get_btc():
+    """BitcoinをCoinGeckoから取得（24h変化率含む）"""
     url = (
         "https://api.coingecko.com/api/v3/simple/price"
-        "?ids=bitcoin,usd&vs_currencies=jpy,usd&include_24hr_change=true"
+        "?ids=bitcoin&vs_currencies=usd&include_24hr_change=true"
     )
     return fetch_json(url)
 
@@ -58,29 +71,27 @@ def build_message(now):
     time_str = now.strftime("%H:%M JST  %Y/%m/%d")
     lines = [f"*相場情報 - {time_str}*\n"]
 
-    # CoinGeckoで為替・BTC一括取得
+    # USD/JPY（Yahoo Finance）
     try:
-        cg = get_market_data()
-
-        # USD/JPY
-        usdjpy = float(cg["usd"]["jpy"])
-        usdjpy_pct = float(cg["usd"].get("jpy_24h_change") or 0.0)
+        usdjpy, usdjpy_pct = get_usdjpy()
         lines.append(
             f"{arrow(usdjpy_pct)} *USD/JPY* ({pct(usdjpy_pct)})\n{fmt(usdjpy)} 円\n"
         )
- 
-        # Bitcoin（USD建て）
+    except Exception as e:
+        lines.append(f"🟡 *USD/JPY*\n取得失敗 ({e})")
+
+    # Bitcoin（CoinGecko）
+    try:
+        cg = get_btc()
         btc_usd = float(cg["bitcoin"]["usd"])
         btc_pct = float(cg["bitcoin"].get("usd_24h_change") or 0.0)
         lines.append(
             f"{arrow(btc_pct)} *Bitcoin* ({pct(btc_pct)})\n${fmt(btc_usd, 0)}\n"
         )
-
     except Exception as e:
-        lines.append(f"🟡 *USD/JPY*\n取得失敗 ({e})")
         lines.append(f"🟡 *Bitcoin*\n取得失敗 ({e})")
 
-    # 日経平均
+    # 日経平均（Yahoo Finance）
     try:
         price, change_pct = get_nikkei()
         lines.append(
