@@ -54,7 +54,7 @@ def get_nikkei():
     return price, change_pct
 
 
-def arrow(value):
+def trend_icon(value):
     return "🟢" if value >= 0 else "🔴"
 
 
@@ -75,7 +75,7 @@ def build_message(now):
     try:
         usdjpy, usdjpy_pct = get_usdjpy()
         lines.append(
-            f"{arrow(usdjpy_pct)} *USD/JPY* ({pct(usdjpy_pct)})\n{fmt(usdjpy)} 円\n"
+            f"{trend_icon(usdjpy_pct)} *USD/JPY* ({pct(usdjpy_pct)})\n{fmt(usdjpy)} 円\n"
         )
     except Exception as e:
         lines.append(f"🟡 *USD/JPY*\n取得失敗 ({e})")
@@ -86,7 +86,7 @@ def build_message(now):
         btc_usd = float(cg["bitcoin"]["usd"])
         btc_pct = float(cg["bitcoin"].get("usd_24h_change") or 0.0)
         lines.append(
-            f"{arrow(btc_pct)} *Bitcoin* ({pct(btc_pct)})\n${fmt(btc_usd, 0)}\n"
+            f"{trend_icon(btc_pct)} *Bitcoin* ({pct(btc_pct)})\n${fmt(btc_usd, 0)}\n"
         )
     except Exception as e:
         lines.append(f"🟡 *Bitcoin*\n取得失敗 ({e})")
@@ -95,7 +95,7 @@ def build_message(now):
     try:
         price, change_pct = get_nikkei()
         lines.append(
-            f"{arrow(change_pct)} *日経平均* ({pct(change_pct)})\n{fmt(price)} 円\n"
+            f"{trend_icon(change_pct)} *日経平均* ({pct(change_pct)})\n{fmt(price)} 円\n"
         )
     except Exception as e:
         lines.append(f"🟡 *日経平均*\n取得失敗 ({e})")
