@@ -6,11 +6,16 @@ GitHub Actionsで動くため、サーバー不要・完全無料で運用でき
 ## 通知イメージ
 
 ```
-📊 相場情報 - 10:00 JST  2026/03/28
+*相場情報 - 10:00 JST  2026/03/28*
 
-💴 USD/JPY：¥149.87 円
-🔻 日経平均：38,500.12 円  (-230.58 / -0.43%)
-🔺 Bitcoin（BTC/JPY）：¥10,868,481  (+1.23% 24h)
+🟢 *USD/JPY* (+0.12%)
+149.87 円
+
+🔴 *Bitcoin* (-1.23%)
+$83,500
+
+🔴 *日経平均* (-0.43%)
+38,500.12 円
 ```
 
 ## 通知スケジュール
@@ -60,6 +65,6 @@ Slackに通知が届けばセットアップ完了です🎉
 
 | データ | API |
 |--------|-----|
-| USD/JPY | [Frankfurter API](https://www.frankfurter.app/) |
+| USD/JPY | [Yahoo Finance API](https://finance.yahoo.com/) |
 | 日経平均 | [Yahoo Finance API](https://finance.yahoo.com/) |
 | Bitcoin | [CoinGecko API](https://www.coingecko.com/) |
