@@ -27,7 +27,7 @@ def get_usdjpy():
     result = data["chart"]["result"][0]
     meta = result["meta"]
     price = meta.get("regularMarketPrice") or meta.get("previousClose")
-    prev = meta.get("previousClose", price)
+    prev = meta.get("chartPreviousClose") or meta.get("previousClose", price)
     change_pct = ((price - prev) / prev) * 100 if prev else 0
     return price, change_pct
 
@@ -49,7 +49,7 @@ def get_nikkei():
     result = data["chart"]["result"][0]
     meta = result["meta"]
     price = meta.get("regularMarketPrice") or meta.get("previousClose")
-    prev = meta.get("previousClose", price)
+    prev = meta.get("chartPreviousClose") or meta.get("previousClose", price)
     change_pct = ((price - prev) / prev) * 100 if prev else 0
     return price, change_pct
 
