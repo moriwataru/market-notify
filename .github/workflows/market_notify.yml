@@ -3,9 +3,9 @@ name: 相場通知 to Slack
 on:
   schedule:
     # JST = UTC+9 なので UTC で指定
-    - cron: '36 0 * * *'   # JST 09:36
-    - cron: '36 2 * * *'   # JST 11:36
-    - cron: '36 5 * * *'   # JST 14:36
+    - cron: '36 0 * * 1-5'   # JST 09:36 (月〜金)
+    - cron: '36 2 * * 1-5'   # JST 11:36 (月〜金)
+    - cron: '36 5 * * 1-5'   # JST 14:36 (月〜金)
   workflow_dispatch:       # 手動実行ボタン（テスト用）
 
 jobs:
